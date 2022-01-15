@@ -1,0 +1,21 @@
+#canvasId {
+    border: 1px solid red;
+}
+
+.canvasWrapper {
+    position: relative;
+    width: 600px;
+    height: 600px;
+    z-index: 2;
+}
+
+.customPointer {
+    z-index: -1;
+    top: 10px;
+    left: 0;
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    border: 1px solid red;
+}
