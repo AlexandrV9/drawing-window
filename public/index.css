@@ -1,21 +1,66 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body, canvasWrapper
+{
+    width: 100vw;
+    height: 100vh;
+}
+
 #canvasId {
     border: 1px solid red;
+    display: block;
 }
 
 .canvasWrapper {
     position: relative;
-    width: 600px;
-    height: 600px;
-    z-index: 2;
+    z-index: 1;
 }
 
 .customPointer {
+    display: none;
     z-index: -1;
     top: 10px;
     left: 0;
     position: absolute;
-    width: 5px;
-    height: 5px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     border: 1px solid red;
+}
+
+.scale {
+    display: flex;
+    border-radius: 5px;
+    background: lightgray;
+    cursor: pointer;
+    z-index: 2;
+    padding: 10px;
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+}
+
+.scale__subtitle {
+    margin-right: 10px;
+}
+
+.scale__value,
+.scale__subtitle,
+.header__title {
+    font-size: 30px;
+}
+
+.header {
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 2;
+    padding: 5px;
+    background: lightgray;
+    position: fixed;
+    left: 10px;
+    top: 10px;
 }
