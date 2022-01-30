@@ -30,9 +30,28 @@ io.on('connection', (socket) => {
             if (err) throw err;
             console.log('Saved!');
         });
-
-        io.emit('json_to_board', data);
+        const currentData = {
+            coords: data,
+            id: socket.id
+        }
+        io.emit('json_to_board', currentData);
     });
+    socket.on('new-picture', (objJSON) => {
+        let obj = JSON.parse(objJSON)
+        fs.readFile('./data.json','utf-8', function (err, data) {
+            if (err) throw err;
+            let currentArrayObjects = (data === '') ?  [] : JSON.parse(data);
+            currentArrayObjects.push(obj);
+            fs.writeFile('data.json', JSON.stringify(currentArrayObjects), function (err) {
+                console.log('Saved!');
+            })
+        });
+        const currentData = {
+            coords: objJSON,
+            id: socket.id
+        }
+        io.emit('new-picture', currentData)
+    })
     socket.on('cursor_coordinates', (data) => {
         const currentData = {
             coords: data,
@@ -49,7 +68,7 @@ io.on('connection', (socket) => {
     });
 });
 
-const PORT = process.env.PORT || 8020;
+const PORT = process.env.PORT || 8080;
 
 server.listen(PORT, () => {
     console.log('listening on *:8080');

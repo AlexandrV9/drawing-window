@@ -18,7 +18,18 @@
 
     <div class="scale">
         <p class="scale__subtitle">Масштаб</p>
-        <span class="scale__value">100%</span>
+        <span class="scale__value"></span>
+    </div>
+
+    <div class="settings-panel">
+        <p class="settings-panel__title">Панель настроек</p>
+        <div class="settings-panel__grid">
+            <label class="settings-panel__subtitle" for="text-grid">Сетка</label>
+            <select name="grid" class="settings-panel__select" id="text-grid">
+                <option value="usual" selected>Обычная</option>
+                <option value="triangular">Треугольная</option>
+            </select>
+        </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>

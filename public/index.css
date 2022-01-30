@@ -4,7 +4,7 @@
     box-sizing: border-box;
 }
 
-html, body, canvasWrapper
+html, body, .canvasWrapper
 {
     width: 100vw;
     height: 100vh;
@@ -18,6 +18,7 @@ html, body, canvasWrapper
 .canvasWrapper {
     position: relative;
     z-index: 1;
+    /*background: repeat center / 80px url('./images/grids/svg.svg');*/
 }
 
 .customPointer {
@@ -29,7 +30,8 @@ html, body, canvasWrapper
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    border: 1px solid red;
+    /*border: 1px solid red;*/
+    background-color: red;
 }
 
 .scale {
@@ -52,6 +54,7 @@ html, body, canvasWrapper
 .scale__subtitle,
 .header__title {
     font-size: 30px;
+    font-weight: bold;
 }
 
 .header {
@@ -63,4 +66,35 @@ html, body, canvasWrapper
     position: fixed;
     left: 10px;
     top: 10px;
+}
+
+.settings-panel {
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 2;
+    background-color: lightgray;
+    position: absolute;
+    top: 80px;
+    left: 10px;
+}
+
+.settings-panel__grid {
+    display: flex;
+    padding: 5px;
+}
+
+.settings-panel__select {
+    font-size: 16px;
+}
+
+.settings-panel__subtitle {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.settings-panel__title {
+    font-weight: bold;
+    font-size: 20px;
+    text-align: center;
+    margin-bottom: 10px;
 }
