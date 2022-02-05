@@ -21,19 +21,6 @@ html, body, .canvasWrapper
     /*background: repeat center / 80px url('./images/grids/svg.svg');*/
 }
 
-.customPointer {
-    display: none;
-    z-index: -1;
-    top: 10px;
-    left: 0;
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    /*border: 1px solid red;*/
-    background-color: red;
-}
-
 .scale {
     display: flex;
     border-radius: 5px;

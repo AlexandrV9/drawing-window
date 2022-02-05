@@ -1,10 +1,6 @@
 const customCursor = document.querySelector('.customPointer');
 const scaleValue = document.querySelector('.scale__value');
 const gridSelection = document.querySelector('.settings-panel__select');
-
-const pathUsualGrid = "./images/grids/usual-grid.svg";
-const pathTriangularGrid = "./images/grids/triangular-grid.svg";
-
 const canvas = new fabric.Canvas(
     document.getElementById('canvasId'),
     {
@@ -13,30 +9,29 @@ const canvas = new fabric.Canvas(
     },
 );
 
-canvas.setBackgroundColor({
-        source: pathUsualGrid,
-        repeat: 'repeat',
-        scaleX: 1,
-        scaleY: 1
-    }, canvas.renderAll.bind(canvas)
-);
-
-const socket = io();
-
-canvas.freeDrawingBrush.width = 5;
-canvas.freeDrawingBrush.color = '#00aeff';
+const pathUsualGrid = "./images/grids/usual-grid.svg";
+const pathTriangularGrid = "./images/grids/triangular-grid.svg";
 
 const MAX_ZOOM_IN = 4;
 const MAX_ZOOM_OUT = 0.05;
 const SCALE_STEP = 0.05;
 
+let currentRadiusCursor = 10;
 let currentValueZoom = 1;
 
-const handleMouseMovement = (event) => {
-    const cursorCoordinates = canvas.getPointer(event.e);
-    console.log(cursorCoordinates)
-    socket.emit('cursor_coordinates', cursorCoordinates);
-}
+scaleValue.textContent = currentValueZoom * 100 + '%';
+
+canvas.freeDrawingBrush.width = 5;
+canvas.freeDrawingBrush.color = '#00aeff';
+
+canvas.setBackgroundColor({
+        source: pathUsualGrid,
+        repeat: 'repeat',
+        scaleX: 1,
+        scaleY: 1
+    }, canvas.renderAll.bind(canvas));
+
+const socket = io();
 
 fabric.Canvas.prototype.toggleDragMode = function () {
     const STATE_IDLE = "idle";
@@ -48,7 +43,6 @@ fabric.Canvas.prototype.toggleDragMode = function () {
     let state = STATE_IDLE;
     // We're entering dragmode
     if (canvas.isDrawingMode) {
-        customCursor.style.display = 'none';
         this.off('mouse:move');
         // Discard any active object
         canvas.discardActiveObject();
@@ -66,6 +60,7 @@ fabric.Canvas.prototype.toggleDragMode = function () {
         // // When MouseUp fires, we set the state to idle
         this.on("mouse:up", function (e) {
             state = STATE_IDLE;
+
         });
         // // When MouseDown fires, we set the state to panning
         this.on("mouse:down", (e) => {
@@ -78,20 +73,22 @@ fabric.Canvas.prototype.toggleDragMode = function () {
             if (state === STATE_PANNING && e && e.e) {
                 // let delta = new fabric.Point(e.e.movementX, e.e.movementY); // No Safari support for movementX and movementY
                 // For cross-browser compatibility, I had to manually keep track of the delta
-
+                // console.log(e.e)
                 // Calculate deltas
-                let deltaX = 0;
-                let deltaY = 0;
+
                 if (lastClientX) {
-                    deltaX = e.e.clientX - lastClientX;
+                    deltaX = e.e.clientX - lastClientX; // смещение по оси X
+                                                        // (если вниз передвигаемся, то
+                                                        // это значение уменьшается иначе увеличивается)
                 }
                 if (lastClientY) {
-                    deltaY = e.e.clientY - lastClientY;
+                    deltaY = e.e.clientY - lastClientY; // смещение по оси Y
+                                                        // (если влево передвигаемся, то
+                                                        // это значение увеличивается иначе уменьшается)
                 }
                 // Update the last X and Y values
                 lastClientX = e.e.clientX;
                 lastClientY = e.e.clientY;
-
                 let delta = new fabric.Point(deltaX, deltaY);
                 this.relativePan(delta);
                 // this.trigger("moved");
@@ -114,7 +111,6 @@ fabric.Canvas.prototype.toggleDragMode = function () {
         this.selection = true;
     }
 };
-
 canvas.toObject = (function (toObject) {
     return function () {
         return fabric.util.object.extend(toObject.call(this), {
@@ -124,23 +120,20 @@ canvas.toObject = (function (toObject) {
 
 })(canvas.toObject)
 
-function resizeCanvas() {
+const handleMouseMovement = (event) => {
+    const cursorCoordinate = canvas.getPointer(event.e);
+    let data = {
+        userId: socket.id,
+        coords: cursorCoordinate,
+    }
+    socket.emit('cursor-data', data);
+}
+const resizeCanvas = () => {
     canvas.setHeight(window.innerHeight);
     canvas.setWidth(window.innerWidth);
-    // const objects = canvas.getObjects();
-    // console.log(objects);
-    // const selection = new fabric.ActiveSelection(objects, { canvas: canvas });
-    // const width = selection.width;
-    // const height = selection.height;
-    // let scale = canvas.width/width
-    // selection.scale(0.2);
-    // selection.center();
-    // console.log(width, height);
-    // const center = {x: w / 2, y:h / 2);
-    // console.log(canvas.getObjects())
     canvas.renderAll();
 }
-function handleScale(delta){
+const handleScale = (delta) => {
     if(delta < 0) {
         if(currentValueZoom <= MAX_ZOOM_OUT) return;
         currentValueZoom = (parseFloat(currentValueZoom) - SCALE_STEP).toFixed(2);
@@ -149,24 +142,15 @@ function handleScale(delta){
         currentValueZoom = (parseFloat(currentValueZoom) + SCALE_STEP).toFixed(2);
     }
 }
-
-
-
 // function draw() {
 //     resizeCanvas();
 //     requestAnimationFrame(draw);
 // }
 
 resizeCanvas();
-
 // draw();
 
-window.addEventListener('resize', (e) => {
-    e.preventDefault();
-    resizeCanvas();
-}, false);
-
-canvas.on('path:created', function(e) {
+canvas.on('path:created', (e) => {
     e.path.set();
     // newLine.id = canvas.size() - 1;
     console.log('1');
@@ -174,14 +158,8 @@ canvas.on('path:created', function(e) {
     socket.emit('new-picture', JSON.stringify(e.path))
     // socket.emit('json_to_board', JSON.stringify(canvas));
 });
-
-
-
-
 canvas.on('mouse:move', (event) => handleMouseMovement(event));
-canvas.on('mouse:wheel', function(opt) {
-    // const listeners = fabric.Canvas.activeInstance;
-    // console.log(listeners);
+canvas.on('mouse:wheel', (opt) => {
     const delta = opt.e.deltaY;
     handleScale(delta);
     scaleValue.textContent = (currentValueZoom * 100).toFixed(0) + '%';
@@ -190,34 +168,82 @@ canvas.on('mouse:wheel', function(opt) {
     opt.e.preventDefault();
     opt.e.stopPropagation();
 });
-
-
-
-// let id;
-// canvas.on('object:added', function(e) {
-//     id = 0;
-//     canvas.getObjects().map((item, index) => {
-//         id++;
+// canvas.on('mouse:down', () => {
+// })
+// canvas.on('mouse:up', () => {
 //
-//     })
-//     console.log(id)
-// if(!!e.target.type && !e.target.fill) {
-//     console.log(e.target);
-//     cut.push({id: id , ...e.target});
-//     id++;
-//     console.log('-------');
-//     console.log(cut);
-// }
+// })
 
-// canvas.clear().renderAll();
-// initialGroup.add(new fabric.Object(object));
-// console.log(initialGroup.getCenterPoint());
-// console.log(initialGroup);
-// initialGroup.center();
+const cursorUser = new fabric.Circle({
+    radius: currentRadiusCursor,
+    fill: 'red',
+    left: -10,
+    top: -10,
+    originX: 'center',
+    originY: 'center',
+});
 
-// });
+canvas.add(cursorUser);
 
+socket.on('saveImg', (data) => {
+    if(data) {
+        let buffer = JSON.parse(data);
+        fabric.util.enlivenObjects(buffer, function (objects) {
+            const origRenderOnAddRemove = canvas.renderOnAddRemove;
+            canvas.renderOnAddRemove = false;
+            // let id = 0;
+            objects.forEach(function (obj) {
+                // obj.id = id
+                canvas.add(obj)
+                // id++;
+            });
+            canvas.renderOnAddRemove = origRenderOnAddRemove;
+            canvas.renderAll();
+        });
+        // const objects = canvas.getObjects();
+        // const selection = new fabric.ActiveSelection(objects, { canvas: canvas });
+        // const widthGroups = selection.width;
+        // const heightGroups = selection.height;
+        // selection.center();
+        // selection.scale(1);
+        // selection.destroy();
+        // const groupCenterCoordinates = selection.getCenterPoint();
+        // const optimalScaleX = canvas.width / widthGroups;
+        // const optimalScaleY = canvas.height / heightGroups;
+        // console.log(optimalScaleX, optimalScaleY)
+        // currentValueZoom = (optimalScaleX > optimalScaleY ?
+        //     optimalScaleY >= 1 ? 1 : optimalScaleY
+        //     :
+        //     optimalScaleX >=1 ? 1 : optimalScaleY
+        // )- 0.02;
+        // canvas.zoomToPoint({ x:  groupCenterCoordinates.x, y: groupCenterCoordinates.y}, currentValueZoom);
+        // scaleValue.textContent = (currentValueZoom * 100).toFixed(0) + '%';
+    }
 
+});
+socket.on('new-picture', (data) => {
+    const dar = JSON.parse(data.coords);
+    if(data.id !== socket.id) {
+        const newElement = new fabric.Object(dar);
+        console.log('Загрузка одно объекта')
+        fabric.util.enlivenObjects([newElement], function (objects) {
+            objects.forEach(function (obj) {
+                canvas.add(obj)
+            });
+            canvas.renderAll();
+        });
+    }
+});
+socket.on('cursor-data', (data) => {
+    cursorUser.left = data.cursorCoordinates.x;
+    cursorUser.top = data.cursorCoordinates.y;
+    canvas.renderAll();
+});
+
+window.addEventListener('resize', (e) => {
+    e.preventDefault();
+    resizeCanvas();
+}, false);
 document.body.addEventListener('keydown', e => {
     if (e.code === 'Space' && !e.repeat) {
         e.preventDefault();
@@ -233,83 +259,7 @@ document.body.addEventListener('keyup', e => {
 
     }
 });
-
-// socket.on('json_to_board', function(data) {
-//     canvas.loadFromJSON(data.coords)
-//     if(data.id !== socket.id) {
-//         console.log('Загрузка файла заново')
-//     }
-// });
-
-socket.on('cursor_coordinates', function(data) {
-    let currentWidthCursor = parseInt(getComputedStyle(customCursor).width.match(/\d+/));
-    let currentHeightCursor = parseInt(getComputedStyle(customCursor).height.match(/\d+/));
-
-    customCursor.style.top = (data.coords.y - currentHeightCursor / 2) + 'px';
-    customCursor.style.left = (data.coords.x - currentWidthCursor / 2) + 'px';
-    if(data.id === socket.id) {
-        customCursor.style.display = 'none'
-    } else {
-        customCursor.style.display = 'block';
-    }
-});
-
-
-
-socket.on('saveImg', function(data) {
-    if(data) {
-        let buffer = JSON.parse(data);
-        fabric.util.enlivenObjects(buffer, function (objects) {
-            const origRenderOnAddRemove = canvas.renderOnAddRemove;
-            canvas.renderOnAddRemove = false;
-            let id = 0;
-            objects.forEach(function (obj) {
-                obj.id = id
-                canvas.add(obj)
-                id++;
-            });
-            canvas.renderOnAddRemove = origRenderOnAddRemove;
-            canvas.renderAll();
-        });
-        const objects = canvas.getObjects();
-        const selection = new fabric.ActiveSelection(objects, { canvas: canvas });
-        const widthGroups = selection.width;
-        const heightGroups = selection.height;
-        selection.center();
-        selection.scale(1);
-        const groupCenterCoordinates = selection.getCenterPoint();
-        const optimalScaleX = canvas.width / widthGroups;
-        const optimalScaleY = canvas.height / heightGroups;
-        console.log(optimalScaleX, optimalScaleY)
-        currentValueZoom = (optimalScaleX > optimalScaleY ?
-            optimalScaleY >= 1 ? 1 : optimalScaleY
-            :
-            optimalScaleX >=1 ? 1 : optimalScaleY
-        )- 0.02;
-        canvas.zoomToPoint({ x:  groupCenterCoordinates.x, y: groupCenterCoordinates.y}, currentValueZoom);
-        scaleValue.textContent = (currentValueZoom * 100).toFixed(0) + '%';
-    }
-
-});
-
-socket.on('new-picture', (data) => {
-    const dar = JSON.parse(data.coords);
-    console.log(dar);
-    if(data.id !== socket.id) {
-        const newElement = new fabric.Object(dar);
-        console.log('Загрузка одно объекта')
-        fabric.util.enlivenObjects([newElement], function (objects) {
-            objects.forEach(function (obj) {
-                canvas.add(obj)
-            });
-            canvas.renderAll();
-        });
-    }
-})
-
-
 gridSelection.addEventListener('change', (event) => {
-    console.log(event.target.value)
     if(event.target.value === 'triangular') {
         canvas.setBackgroundColor({ source: pathTriangularGrid }, canvas.renderAll.bind(canvas));
     } else {
