@@ -75,6 +75,9 @@ io.on('connection', (socket) => {
             arrayOfUserCursorCoordinates.splice(index, 1)
         }
     });
+    socket.on('test', (data) => {
+        io.emit('test', data)
+    })
 });
 
 const PORT = process.env.PORT || 8080;

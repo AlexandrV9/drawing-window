@@ -167,21 +167,25 @@ canvas.on('mouse:wheel', (opt) => {
 });
 canvas.on({
     'touch:gesture': function() {
-        console.log('1')
+        socket.emit('test', 'touch:gesture')
     },
     'touch:drag': function() {
-        console.log('2')
+        socket.emit('test', 'touch:drag')
     },
     'touch:orientation': function() {
-        console.log('3')
+        socket.emit('test', 'touch:orientation')
     },
     'touch:shake': function() {
-        console.log('4')
+        socket.emit('test', 'touch:shake')
     },
     'touch:longpress': function() {
-        console.log('5')
+        socket.emit('test', 'touch:longpress')
     }
 });
+
+socket.on('test', (data) => {
+    console.log(data)
+})
 
 const cursorUser = new fabric.Circle({
     radius: currentRadiusCursor,
