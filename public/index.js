@@ -1,4 +1,3 @@
-const customCursor = document.querySelector('.customPointer');
 const scaleValue = document.querySelector('.scale__value');
 const gridSelection = document.querySelector('.settings-panel__select');
 const canvas = new fabric.Canvas(
@@ -153,8 +152,6 @@ resizeCanvas();
 canvas.on('path:created', (e) => {
     e.path.set();
     // newLine.id = canvas.size() - 1;
-    console.log('1');
-    console.log(e.path);
     socket.emit('new-picture', JSON.stringify(e.path))
     // socket.emit('json_to_board', JSON.stringify(canvas));
 });
@@ -168,11 +165,23 @@ canvas.on('mouse:wheel', (opt) => {
     opt.e.preventDefault();
     opt.e.stopPropagation();
 });
-// canvas.on('mouse:down', () => {
-// })
-// canvas.on('mouse:up', () => {
-//
-// })
+canvas.on({
+    'touch:gesture': function() {
+        console.log('1')
+    },
+    'touch:drag': function() {
+        console.log('2')
+    },
+    'touch:orientation': function() {
+        console.log('3')
+    },
+    'touch:shake': function() {
+        console.log('4')
+    },
+    'touch:longpress': function() {
+        console.log('5')
+    }
+});
 
 const cursorUser = new fabric.Circle({
     radius: currentRadiusCursor,
@@ -182,8 +191,6 @@ const cursorUser = new fabric.Circle({
     originX: 'center',
     originY: 'center',
 });
-
-canvas.add(cursorUser);
 
 socket.on('saveImg', (data) => {
     if(data) {
@@ -235,9 +242,13 @@ socket.on('new-picture', (data) => {
     }
 });
 socket.on('cursor-data', (data) => {
-    cursorUser.left = data.cursorCoordinates.x;
-    cursorUser.top = data.cursorCoordinates.y;
+    if(data.userId !== socket.id) {
+        canvas.add(cursorUser)
+        cursorUser.left = data.cursorCoordinates.x;
+        cursorUser.top = data.cursorCoordinates.y;
+    }
     canvas.renderAll();
+
 });
 
 window.addEventListener('resize', (e) => {
