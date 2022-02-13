@@ -18,7 +18,7 @@ html, body, .canvasWrapper
 .canvasWrapper {
     position: relative;
     z-index: 1;
-    /*background: repeat center / 80px url('./images/grids/svg.svg');*/
+    /*background: repeat center / 80px url('./images/grids/cursor-move-active.svg');*/
 }
 
 .scale {
@@ -67,6 +67,8 @@ html, body, .canvasWrapper
 
 .settings-panel__grid {
     display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 5px;
 }
 
@@ -84,4 +86,19 @@ html, body, .canvasWrapper
     font-size: 20px;
     text-align: center;
     margin-bottom: 10px;
+}
+
+.settings-panel__cursor-move {
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    border-radius: 10px;
+    background: no-repeat center/40px url("./images/icons/cursor-move.svg");
+    border: 3px solid rgba(0, 0, 0, 0.6);
+}
+
+
+.settings-panel__cursor-move_active {
+    opacity: 1;
+    background-image: url("./images/icons/cursor-move-active.svg");
 }

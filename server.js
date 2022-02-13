@@ -33,7 +33,6 @@ io.on('connection', (socket) => {
         if (err) throw err;
         socket.emit("saveImg", data);
     })
-
     socket.on('cursor-data', (data) => {
         const cursorDataUser = arrayOfUserCursorCoordinates.find(item => item.userId === data.userId);
         if(cursorDataUser) {
@@ -57,13 +56,13 @@ io.on('connection', (socket) => {
         }
         io.emit('new-picture', currentData)
     });
-    socket.on('cursor_coordinates', (data) => {
-        const currentData = {
-            coords: data,
-            id: socket.id
-        }
-        io.sockets.emit('cursor_coordinates', currentData);
-    });
+    // socket.on('cursor_coordinates', (data) => {
+    //     const currentData = {
+    //         coords: data,
+    //         id: socket.id
+    //     }
+    //     io.sockets.emit('cursor_coordinates', currentData);
+    // });
     socket.on('disconnect', () => {
         const index = arrayAllUsers.findIndex(item => item === socket.id);
         const index2 = arrayOfUserCursorCoordinates.findIndex(item => item.userId === socket.id);

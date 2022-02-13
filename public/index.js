@@ -1,5 +1,7 @@
 const scaleValue = document.querySelector('.scale__value');
 const gridSelection = document.querySelector('.settings-panel__select');
+const buttonCursorMove = document.querySelector('.settings-panel__cursor-move');
+
 const canvas = new fabric.Canvas(
     document.getElementById('canvasId'),
     {
@@ -22,6 +24,8 @@ scaleValue.textContent = currentValueZoom * 100 + '%';
 
 canvas.freeDrawingBrush.width = 5;
 canvas.freeDrawingBrush.color = '#00aeff';
+
+let isCursorMove = false;
 
 canvas.setBackgroundColor({
         source: pathUsualGrid,
@@ -105,7 +109,6 @@ fabric.Canvas.prototype.toggleDragMode = function () {
         this.off("mouse:up");
         this.off("mouse:down");
         this.off("mouse:move");
-        this.on('mouse:move', (event) => handleMouseMovement(event));
         // Restore selection ability on the canvas
         this.selection = true;
     }
@@ -119,14 +122,14 @@ canvas.toObject = (function (toObject) {
 
 })(canvas.toObject)
 
-const handleMouseMovement = (event) => {
-    const cursorCoordinate = canvas.getPointer(event.e);
-    let data = {
-        userId: socket.id,
-        coords: cursorCoordinate,
-    }
-    socket.emit('cursor-data', data);
-}
+// const handleMouseMovement = (event) => {
+//     const cursorCoordinate = canvas.getPointer(event.e);
+//     let data = {
+//         userId: socket.id,
+//         coords: cursorCoordinate,
+//     }
+//     socket.emit('cursor-data', data);
+// }
 const resizeCanvas = () => {
     canvas.setHeight(window.innerHeight);
     canvas.setWidth(window.innerWidth);
@@ -155,7 +158,22 @@ canvas.on('path:created', (e) => {
     socket.emit('new-picture', JSON.stringify(e.path))
     // socket.emit('json_to_board', JSON.stringify(canvas));
 });
-canvas.on('mouse:move', (event) => handleMouseMovement(event));
+
+
+
+
+canvas.on('mouse:move', (event) => {
+    const cursorCoordinate = canvas.getPointer(event.e);
+    let data = {
+        userId: socket.id,
+        coords: cursorCoordinate,
+    }
+    socket.emit('cursor-data', data);
+});
+
+
+
+
 canvas.on('mouse:wheel', (opt) => {
     const delta = opt.e.deltaY;
     handleScale(delta);
@@ -165,23 +183,23 @@ canvas.on('mouse:wheel', (opt) => {
     opt.e.preventDefault();
     opt.e.stopPropagation();
 });
-canvas.on({
-    'touch:gesture': function() {
-        socket.emit('test', 'touch:gesture')
-    },
-    'touch:drag': function() {
-        socket.emit('test', 'touch:drag')
-    },
-    'touch:orientation': function() {
-        socket.emit('test', 'touch:orientation')
-    },
-    'touch:shake': function() {
-        socket.emit('test', 'touch:shake')
-    },
-    'touch:longpress': function() {
-        socket.emit('test', 'touch:longpress')
-    }
-});
+// canvas.on({
+//     'touch:gesture': function() {
+//         socket.emit('test', 'touch:gesture')
+//     },
+//     'touch:drag': function() {
+//         socket.emit('test', 'touch:drag')
+//     },
+//     'touch:orientation': function() {
+//         socket.emit('test', 'touch:orientation')
+//     },
+//     'touch:shake': function() {
+//         socket.emit('test', 'touch:shake')
+//     },
+//     'touch:longpress': function() {
+//         socket.emit('test', 'touch:longpress')
+//     }
+// });
 
 socket.on('test', (data) => {
     console.log(data)
@@ -252,32 +270,41 @@ socket.on('cursor-data', (data) => {
         cursorUser.top = data.cursorCoordinates.y;
     }
     canvas.renderAll();
-
 });
 
 window.addEventListener('resize', (e) => {
     e.preventDefault();
     resizeCanvas();
 }, false);
-document.body.addEventListener('keydown', e => {
+
+const handleMovingCursor = (e) => {
     if (e.code === 'Space' && !e.repeat) {
         e.preventDefault();
         canvas.toggleDragMode();
-        canvas.isDrawingMode = false;
+        canvas.isDrawingMode = !canvas.isDrawingMode;
+        buttonCursorMove.classList.toggle('settings-panel__cursor-move_active');
+        isCursorMove = false;
+        if(!isCursorMove) {
+            document.body.addEventListener('keydown', handleMovingCursor)
+        }
     }
-});
-document.body.addEventListener('keyup', e => {
-    if (e.code === 'Space') {
-        e.preventDefault();
-        canvas.toggleDragMode();
-        canvas.isDrawingMode = true;
+}
 
-    }
-});
+document.body.addEventListener('keydown', handleMovingCursor);
+document.body.addEventListener('keyup', handleMovingCursor);
 gridSelection.addEventListener('change', (event) => {
     if(event.target.value === 'triangular') {
         canvas.setBackgroundColor({ source: pathTriangularGrid }, canvas.renderAll.bind(canvas));
     } else {
         canvas.setBackgroundColor({ source: pathUsualGrid }, canvas.renderAll.bind(canvas));
     }
+});
+buttonCursorMove.addEventListener('click', () => {
+    isCursorMove = !isCursorMove;
+    if(isCursorMove){
+        document.body.removeEventListener('keydown', handleMovingCursor)
+    }
+    canvas.toggleDragMode();
+    buttonCursorMove.classList.toggle('settings-panel__cursor-move_active');
+    canvas.isDrawingMode = !canvas.isDrawingMode;
 })
