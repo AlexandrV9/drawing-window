@@ -88,7 +88,8 @@ html, body, .canvasWrapper
     margin-bottom: 10px;
 }
 
-.settings-panel__cursor-move {
+.settings-panel__button-cursor-move {
+    outline: none;
     width: 50px;
     height: 50px;
     cursor: pointer;
@@ -98,7 +99,15 @@ html, body, .canvasWrapper
 }
 
 
-.settings-panel__cursor-move_active {
+.settings-panel__button-cursor-move_active {
     opacity: 1;
     background-image: url("./images/icons/cursor-move-active.svg");
+}
+
+.settings-panel__button-cursor-move_disabled {
+    cursor: not-allowed;
+}
+
+.infoDiv {
+    font-size: 20px;
 }

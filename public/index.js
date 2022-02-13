@@ -1,6 +1,6 @@
 const scaleValue = document.querySelector('.scale__value');
 const gridSelection = document.querySelector('.settings-panel__select');
-const buttonCursorMove = document.querySelector('.settings-panel__cursor-move');
+const buttonCursorMove = document.querySelector('.settings-panel__button-cursor-move');
 
 const canvas = new fabric.Canvas(
     document.getElementById('canvasId'),
@@ -35,6 +35,15 @@ canvas.setBackgroundColor({
     }, canvas.renderAll.bind(canvas));
 
 const socket = io();
+
+const handleMouseMovement = (event) => {
+    const cursorCoordinate = canvas.getPointer(event.e);
+    let data = {
+        userId: socket.id,
+        coords: cursorCoordinate,
+    }
+    socket.emit('cursor-data', data);
+}
 
 fabric.Canvas.prototype.toggleDragMode = function () {
     const STATE_IDLE = "idle";
@@ -109,6 +118,7 @@ fabric.Canvas.prototype.toggleDragMode = function () {
         this.off("mouse:up");
         this.off("mouse:down");
         this.off("mouse:move");
+        this.on("mouse:move", (event) => handleMouseMovement(event))
         // Restore selection ability on the canvas
         this.selection = true;
     }
@@ -156,24 +166,12 @@ canvas.on('path:created', (e) => {
     e.path.set();
     // newLine.id = canvas.size() - 1;
     socket.emit('new-picture', JSON.stringify(e.path))
-    // socket.emit('json_to_board', JSON.stringify(canvas));
 });
 
 
 
 
-canvas.on('mouse:move', (event) => {
-    const cursorCoordinate = canvas.getPointer(event.e);
-    let data = {
-        userId: socket.id,
-        coords: cursorCoordinate,
-    }
-    socket.emit('cursor-data', data);
-});
-
-
-
-
+canvas.on('mouse:move', (event) => handleMouseMovement(event));
 canvas.on('mouse:wheel', (opt) => {
     const delta = opt.e.deltaY;
     handleScale(delta);
@@ -183,27 +181,26 @@ canvas.on('mouse:wheel', (opt) => {
     opt.e.preventDefault();
     opt.e.stopPropagation();
 });
-// canvas.on({
-//     'touch:gesture': function() {
-//         socket.emit('test', 'touch:gesture')
-//     },
-//     'touch:drag': function() {
-//         socket.emit('test', 'touch:drag')
-//     },
-//     'touch:orientation': function() {
-//         socket.emit('test', 'touch:orientation')
-//     },
-//     'touch:shake': function() {
-//         socket.emit('test', 'touch:shake')
-//     },
-//     'touch:longpress': function() {
-//         socket.emit('test', 'touch:longpress')
-//     }
-// });
 
-socket.on('test', (data) => {
-    console.log(data)
-})
+const infoDiv = document.querySelector('.infoDiv');
+infoDiv.innerHTML = "<p>Canvas drawn using fabric.js</p>";
+canvas.on({
+    'touch:gesture': function() {
+        infoDiv.innerHTML = "<p>Touch: Gesture</p>";
+    },
+    'touch:drag': function() {
+        infoDiv.innerHTML = "<p>Touch: Drag</p>";
+    },
+    'touch:orientation': function() {
+        infoDiv.innerHTML = "<p>Touch: Orientation</p>";
+    },
+    'touch:shake': function() {
+        infoDiv.innerHTML = "<p>Touch: Shake</p>";
+    },
+    'touch:longpress': function() {
+        infoDiv.innerHTML = "<p>Touch: Longpress</p>";
+    }
+});
 
 const cursorUser = new fabric.Circle({
     radius: currentRadiusCursor,
@@ -265,7 +262,7 @@ socket.on('new-picture', (data) => {
 });
 socket.on('cursor-data', (data) => {
     if(data.userId !== socket.id) {
-        canvas.add(cursorUser)
+        canvas.add(cursorUser);
         cursorUser.left = data.cursorCoordinates.x;
         cursorUser.top = data.cursorCoordinates.y;
     }
@@ -277,21 +274,33 @@ window.addEventListener('resize', (e) => {
     resizeCanvas();
 }, false);
 
-const handleMovingCursor = (e) => {
+const handleDownKeySpace = (e) => {
     if (e.code === 'Space' && !e.repeat) {
         e.preventDefault();
         canvas.toggleDragMode();
-        canvas.isDrawingMode = !canvas.isDrawingMode;
-        buttonCursorMove.classList.toggle('settings-panel__cursor-move_active');
+        canvas.isDrawingMode = false;
+        buttonCursorMove.classList.add('settings-panel__button-cursor-move_active');
+        buttonCursorMove.classList.add('settings-panel__button-cursor-move_disabled');
+        isCursorMove = true;
+    }
+}
+const handleUpKeySpace = (e) => {
+    if (e.code === 'Space') {
+        e.preventDefault();
+        canvas.toggleDragMode();
+        canvas.isDrawingMode = true;
+        buttonCursorMove.classList.remove('settings-panel__button-cursor-move_active');
+        buttonCursorMove.classList.remove('settings-panel__button-cursor-move_disabled');
         isCursorMove = false;
         if(!isCursorMove) {
-            document.body.addEventListener('keydown', handleMovingCursor)
+            document.body.addEventListener('keydown', handleDownKeySpace)
         }
     }
 }
 
-document.body.addEventListener('keydown', handleMovingCursor);
-document.body.addEventListener('keyup', handleMovingCursor);
+document.body.addEventListener('keydown', handleDownKeySpace);
+document.body.addEventListener('keyup', handleUpKeySpace);
+
 gridSelection.addEventListener('change', (event) => {
     if(event.target.value === 'triangular') {
         canvas.setBackgroundColor({ source: pathTriangularGrid }, canvas.renderAll.bind(canvas));
@@ -302,9 +311,9 @@ gridSelection.addEventListener('change', (event) => {
 buttonCursorMove.addEventListener('click', () => {
     isCursorMove = !isCursorMove;
     if(isCursorMove){
-        document.body.removeEventListener('keydown', handleMovingCursor)
+        document.body.removeEventListener('keydown', handleDownKeySpace)
     }
     canvas.toggleDragMode();
-    buttonCursorMove.classList.toggle('settings-panel__cursor-move_active');
+    buttonCursorMove.classList.toggle('settings-panel__button-cursor-move_active');
     canvas.isDrawingMode = !canvas.isDrawingMode;
 })
