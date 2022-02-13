@@ -184,21 +184,46 @@ canvas.on('mouse:wheel', (opt) => {
 
 const infoDiv = document.querySelector('.infoDiv');
 infoDiv.innerHTML = "<p>Canvas drawn using fabric.js</p>";
+
+let pausePanning;
+let zoomStartScale = 1;
+
+let currentX, currentY, xChange, yChange, lastX, lastY;
+
 canvas.on({
-    'touch:gesture': function() {
-        infoDiv.innerHTML = "<p>Touch: Gesture</p>";
+    'touch:gesture': function(e) {
+        if (e.e.touches && e.e.touches.length == 2) {
+            pausePanning = true;
+            let point = new fabric.Point(e.self.x, e.self.y);
+            if (e.self.state == "start") {
+                zoomStartScale = self.canvas.getZoom();
+            }
+            let delta = zoomStartScale * e.self.scale;
+            self.canvas.zoomToPoint(point, delta);
+            pausePanning = false;
+        }
     },
-    'touch:drag': function() {
-        infoDiv.innerHTML = "<p>Touch: Drag</p>";
+    'object:selected': function() {
+        pausePanning = true;
     },
-    'touch:orientation': function() {
-        infoDiv.innerHTML = "<p>Touch: Orientation</p>";
+    'selection:cleared': function() {
+        pausePanning = false;
     },
-    'touch:shake': function() {
-        infoDiv.innerHTML = "<p>Touch: Shake</p>";
-    },
-    'touch:longpress': function() {
-        infoDiv.innerHTML = "<p>Touch: Longpress</p>";
+    'touch:drag': function(e) {
+        if (pausePanning == false && undefined != e.e.layerX && undefined != e.e.layerY) {
+            currentX = e.e.layerX;
+            currentY = e.e.layerY;
+            xChange = currentX - lastX;
+            yChange = currentY - lastY;
+
+            if( (Math.abs(currentX - lastX) <= 50) && (Math.abs(currentY - lastY) <= 50)) {
+                var delta = new fabric.Point(xChange, yChange);
+                canvas.relativePan(delta);
+            }
+
+            lastX = e.e.layerX;
+            lastY = e.e.layerY;
+        }
     }
 });
 
