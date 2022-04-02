@@ -1,48 +1,272 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-    <title>Flask_Chat_App</title>
+    <title>DrawingBoard</title>
+<!--    <link href="./test/test.css" rel="stylesheet">-->
     <link href="./index.css" rel="stylesheet">
+    <script defer src="//unpkg.com/mathlive/dist/mathlive.min.js"></script>
 </head>
 
 <body>
 
-    <header class="header">
-        <p class="header__title">DrawingBoard</p>
-    </header>
-
-    <section class="canvasWrapper">
+    <dev class="canvasWrapper">
         <canvas id="canvasId"></canvas>
-    </section>
+    </dev>
 
-    <div class="scale">
-        <p class="scale__subtitle">Масштаб</p>
-        <span class="scale__value"></span>
+
+    <div class="top-panel">
+        <div class="top-panel__logo">
+            <h1 class="top-panel__logo-text">DrawingBoard</h1>
+            <div class="top-panel__functions">
+                <button class="top-panel__button-functions">
+                    <svg class="top-panel__item-icon-button">
+                        <use xlink:href="../icons/sprite.svg#icon-arrow-down"></use>
+                    </svg>
+                </button>
+                <div class="logo-menu">
+                    <ul class="logo-menu__list">
+                        <li class="logo-menu__item">Очистить доску</li>
+                        <li class="logo-menu__item">Экспорт в PDF</li>
+                        <li class="logo-menu__item">Личный кабинет</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
+    <div class="tool-panel">
+        <ul class="tool-panel__list">
+            <li class="tool-panel__item">
+                <button class="tool-panel__item-button tool-panel__item-button-moving">
+                    <svg class="tool-panel__item-icon-button">
+                        <use xlink:href="../icons/sprite.svg#icon-hand"></use>
+                    </svg>
+                </button>
+            </li>
+            <li class="tool-panel__item">
+                <button class="tool-panel__item-button tool-panel__item-button-free-drawing">
+                    <svg class="tool-panel__item-icon-button">
+                        <use xlink:href="../icons/sprite.svg#icon-free-drawing"></use>
+                    </svg>
+                </button>
+            </li>
+            <li class="tool-panel__item">
+                <button class="tool-panel__item-button">
+                    <svg class="tool-panel__item-icon-button">
+                        <use xlink:href="../icons/sprite.svg#icon-download"></use>
+                    </svg>
+                </button>
+            </li>
+            <li class="tool-panel__item">
+                <button class="tool-panel__item-button">
+                    <svg class="tool-panel__item-icon-button">
+                        <use xlink:href="../icons/sprite.svg#icon-volumetric-figures-hexagon"></use>
+                    </svg>
+                </button>
+<!--                <div class="sub-tool-panel">-->
+<!--                    <ul class="sub-tool-panel__list">-->
+<!--                        <li class="sub-tool-panel__item-list">-->
+<!--                            <button class="sub-tool-panel__item-button">-->
+<!--                                <svg class="sub-tool-panel__item-icon-button">-->
+<!--                                    <use xlink:href="../icons/sprite.svg#icon-volumetric-figures-hexagon"></use>-->
+<!--                                </svg>-->
+<!--                            </button>-->
+<!--                        </li>-->
+<!--                        <li class="sub-tool-panel__item-list">-->
+<!--                            <button class="sub-tool-panel__item-button">-->
+<!--                                <svg class="sub-tool-panel__item-icon-button">-->
+<!--                                    <use xlink:href="../icons/sprite.svg#icon-volumetric-figures-prism"></use>-->
+<!--                                </svg>-->
+<!--                            </button>-->
+<!--                        </li>-->
+<!--                        <li class="sub-tool-panel__item-list">-->
+<!--                            <button class="sub-tool-panel__item-button">-->
+<!--                                <svg class="sub-tool-panel__item-icon-button">-->
+<!--                                    <use xlink:href="../icons/sprite.svg#icon-volumetric-figures-cylinder"></use>-->
+<!--                                </svg>-->
+<!--                            </button>-->
+<!--                        </li>-->
+<!--                        <li class="sub-tool-panel__item-list">-->
+<!--                            <button class="sub-tool-panel__item-button">-->
+<!--                                <svg class="sub-tool-panel__item-icon-button">-->
+<!--                                    <use xlink:href="../icons/sprite.svg#icon-volumetric-figures-cone"></use>-->
+<!--                                </svg>-->
+<!--                            </button>-->
+<!--                        </li>-->
+<!--                        <li class="sub-tool-panel__item-list">-->
+<!--                            <button class="sub-tool-panel__item-button">-->
+<!--                                <svg class="sub-tool-panel__item-icon-button">-->
+<!--                                    <use xlink:href="../icons/sprite.svg#icon-volumetric-figures-pyramid-rectangular-base"></use>-->
+<!--                                </svg>-->
+<!--                            </button>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+<!--                </div>-->
+            </li>
+            <li class="tool-panel__item">
+                <button class="tool-panel__item-button">
+                    <svg class="tool-panel__item-icon-button">
+                        <use xlink:href="../icons/sprite.svg#icon-horizontal-line"></use>
+                    </svg>
+                </button>
+                <div class="sub-tool-panel">
+                    <ul class="sub-tool-panel__list">
+                        <li class="sub-tool-panel__item-list">
+                            <button class="sub-tool-panel__item-button">
+                                <svg class="sub-tool-panel__item-icon-button">
+                                    <use xlink:href="../icons/sprite.svg#icon-horizontal-line"></use>
+                                </svg>
+                            </button>
+                        </li>
+                        <li class="sub-tool-panel__item-list">
+                            <button class="sub-tool-panel__item-button">
+                                <svg class="sub-tool-panel__item-icon-button">
+                                    <use xlink:href="../icons/sprite.svg#icon-line-dots"></use>
+                                </svg>
+                            </button>
+                        </li>
 
-    <div class="settings-panel">
-        <p class="settings-panel__title">Панель настроек</p>
-        <div class="settings-panel__grid">
-            <label class="settings-panel__subtitle" for="text-grid">Сетка</label>
-            <select name="grid" class="settings-panel__select" id="text-grid">
-                <option value="usual" selected>Обычная</option>
-                <option value="triangular">Треугольная</option>
-            </select>
-        </div>
-        <div class="settings-panel__grid">
-            <p class="settings-panel__subtitle">Перемещение</p>
-            <button class="settings-panel__button-cursor-move"></button>
-        </div>
-        <div class="settings-panel__grid">
-            <div class="infoDiv"></div>
-        </div>
+                    </ul>
+                </div>
+            </li>
+            <li class="tool-panel__item">
+                <button class="tool-panel__item-button">
+                    <svg class="tool-panel__item-icon-button">
+                        <use xlink:href="../icons/sprite.svg#icon-circle-with-solid-border"></use>
+                    </svg>
+                </button>
+                <div class="sub-tool-panel">
+                    <ul class="sub-tool-panel__list">
+                        <li class="sub-tool-panel__item-list">
+                            <button class="sub-tool-panel__item-button">
+                                <svg class="sub-tool-panel__item-icon-button">
+                                    <use xlink:href="../icons/sprite.svg#icon-circle-with-solid-border"></use>
+                                </svg>
+                            </button>
+                        </li>
+                        <li class="sub-tool-panel__item-list">
+                            <button class="sub-tool-panel__item-button">
+                                <svg class="sub-tool-panel__item-icon-button">
+                                    <use xlink:href="../icons/sprite.svg#icon-circle-with-dotted-border"></use>
+                                </svg>
+                            </button>
+                        </li>
+                        <li class="sub-tool-panel__item-list">
+                            <button class="sub-tool-panel__item-button">
+                                <svg class="sub-tool-panel__item-icon-button">
+                                    <use xlink:href="../icons/sprite.svg#icon-circle-filled"></use>
+                                </svg>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </li>
 
 
+            <li class="tool-panel__item">
+                <button class="tool-panel__item-button button__show-modal-window-formulas">
+                    <svg class="tool-panel__item-icon-button">
+                        <use xlink:href="../icons/sprite.svg#icon-text"></use>
+                    </svg>
+                </button>
+
+                <div class="form-formulas__wrapper">
+                    <form class="form-formulas">
+                        <math-field virtual-keyboard-mode=manual class="form-formulas__field">
+                            x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}
+                        </math-field>
+                        <button class="button__add-formulas">Добавить</button>
+                    </form>
+                </div>
+            </li>
+
+
+
+
+            <li class="tool-panel__item">
+                <button class="tool-panel__item-button tool-panel__item-button-text">
+                    <svg class="tool-panel__item-icon-button">
+                        <use xlink:href="../icons/sprite.svg#icon-text"></use>
+                    </svg>
+                </button>
+
+                <div class="text-settings">
+                    <div class="text-settings__font-family">
+                        <p class="text-settings__font-family-selected">Open Sans</p>
+                        <button class="text-settings__button-open-list">
+                            <img src="./icons/icons8-down-arrow-32.png">
+                        </button>
+                        <div class="text-settings__font-family-list_wrapper">
+                            <ul class="text-settings__font-family-list">
+                                <li class="text-settings__font-family-item text-settings__font-family_OpSan">Open Sans</li>
+                                <li class="text-settings__font-family-item text-settings__font-family_Mon">Montserrat</li>
+                                <li class="text-settings__font-family-item text-settings__font-family_Rob">Roboto</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="text-settings__font-size">
+                        <div class="text-settings__font-size-value">25</div>
+                        <div class="text-settings__button-font-size-wrapper">
+                            <button class="text-settings__button-font-size-up">
+                                <img src="./icons/icons8-длинная-стрелка-вверх-30.png">
+                            </button>
+                            <button class="text-settings__button-font-size-down">
+                                <img src="./icons/icons8-длинная-стрелка-вниз-30.png">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-text-wrapper">
+                    <form class="form-text">
+                        <input type="text" class="form-text__input" disabled/>
+                        <textarea class="form-text__textarea" cols="40" rows="3"></textarea>
+                        <button class="form-text__button-submit">Добавить</button>
+                    </form>
+                </div>
+
+            </li>
+
+
+
+
+
+            <li class="tool-panel__item">
+                <button class="tool-panel__item-button">
+                    <svg class="tool-panel__item-icon-button">
+                        <use xlink:href="../icons/sprite.svg#icon-color-palette"></use>
+                    </svg>
+                </button>
+                <div class="sub-tool-panel sub-tool-panel__change-color">
+                    <ul class="sub-tool-panel__list">
+                        <li class="sub-tool-panel__item-list">
+                            <label class="sub-tool-panel__item-list-color-selection">
+                                <input type="color">
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="scale-panel">
+        <p class="scale-panel__subtitle">Масштаб:</p>
+        <span class="scale-panel__value"></span>
+    </div>
+    <div class="grid-panel">
+        <p class="grid-panel__title">Сетка</p>
+        <div class="grid-panel__list-wrapper">
+            <ul class="grid-panel__list">
+                <li class="grid-panel__item grid-panel__item-no-grid">без сетки</li>
+                <li class="grid-panel__item grid-panel__item-usual-grid">обычная (в клеточку)</li>
+                <li class="grid-panel__item grid-panel__item-triangular-grid">треугольная</li>
+            </ul>
+        </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://unpkg.com/fabric@4.6.0/dist/fabric.js"></script>
-    <script src="index.js"></script>
+    <script src="index.js" type="module"></script>
 </body>
 
 </html>

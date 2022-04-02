@@ -1,0 +1,20 @@
+@font-face {
+    src:
+            url('./Montserrat/Montserrat-Regular.ttf') format('truetype');
+    font-family: 'Montserrat';
+    font-weight: 400;
+}
+
+@font-face {
+    src:
+            url('./Open_Sans/OpenSans-Regular.ttf') format('truetype');
+    font-family: 'Open Sans';
+    font-weight: 400;
+}
+
+@font-face {
+    src:
+            url('./Roboto/Roboto-Regular.ttf') format('truetype');
+    font-family: 'Roboto';
+    font-weight: 400;
+}

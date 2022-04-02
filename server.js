@@ -20,6 +20,7 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
+    console.log(socket.id)
     arrayAllUsers.push(socket.id);
     arrayOfUserCursorCoordinates.push({
         userId: socket.id,
@@ -71,16 +72,20 @@ io.on('connection', (socket) => {
             arrayAllUsers.splice(index, 1)
         }
         if(index2 !== -1){
-            arrayOfUserCursorCoordinates.splice(index, 1)
+            arrayOfUserCursorCoordinates.splice(index2, 1)
         }
     });
     socket.on('test', (data) => {
         io.emit('test', data)
-    })
+    });
+    socket.on('circle:add', (data) => {
+        socket.broadcast.emit('circle:add', data);
+    });
+
 });
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3080;
 
 server.listen(PORT, () => {
-    console.log('listening on *:8080');
+    console.log('listening on *:3080');
 });

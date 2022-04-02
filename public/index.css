@@ -1,7 +1,31 @@
+@import url('./utils/reset.css');
+
+@import url("./fonts/font.css");
+
+@import url("./blocks/scale-panel/scale-panel.css");
+@import url("./blocks/tool-panel/tool-panel.css");
+@import url("./blocks/top-panel/top-panel.css");
+@import url("./blocks/sub-tool-panel/sub-tool-panel.css");
+@import url("./blocks/logo-menu/logo-menu.css");
+@import url("./blocks/grid-panel/grid-panel.css");
+@import url("./blocks/formulas/formulas.css");
+@import url("./blocks/text-settings/text-settings.css");
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html {
+    font-size: 10px;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
 }
 
 html, body, .canvasWrapper
@@ -18,7 +42,6 @@ html, body, .canvasWrapper
 .canvasWrapper {
     position: relative;
     z-index: 1;
-    /*background: repeat center / 80px url('./images/grids/cursor-move-active.svg');*/
 }
 
 .scale {
@@ -44,70 +67,11 @@ html, body, .canvasWrapper
     font-weight: bold;
 }
 
-.header {
-    border-radius: 5px;
-    cursor: pointer;
-    z-index: 2;
-    padding: 5px;
-    background: lightgray;
-    position: fixed;
-    left: 10px;
-    top: 10px;
+.settings-panel__button_active {
+    background-color: yellow;
 }
 
-.settings-panel {
-    cursor: pointer;
-    border-radius: 5px;
-    z-index: 2;
-    background-color: lightgray;
-    position: absolute;
-    top: 80px;
-    left: 10px;
+.tool-panel__item {
+    position: relative;
 }
 
-.settings-panel__grid {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 5px;
-}
-
-.settings-panel__select {
-    font-size: 16px;
-}
-
-.settings-panel__subtitle {
-    font-size: 20px;
-    margin-right: 10px;
-}
-
-.settings-panel__title {
-    font-weight: bold;
-    font-size: 20px;
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.settings-panel__button-cursor-move {
-    outline: none;
-    width: 50px;
-    height: 50px;
-    cursor: pointer;
-    border-radius: 10px;
-    background: no-repeat center/40px url("./images/icons/cursor-move.svg");
-    border: 3px solid rgba(0, 0, 0, 0.6);
-}
-
-
-.settings-panel__button-cursor-move_active {
-    opacity: 1;
-    background-image: url("./images/icons/cursor-move-active.svg");
-}
-
-.settings-panel__button-cursor-move_disabled {
-    cursor: not-allowed;
-}
-
-.infoDiv {
-    font-size: 20px;
-}
